@@ -121,19 +121,18 @@
                 // jump by value pixels
                 offset += parseInt(o.scrollBy);
               }
-              else if ('destroy' in options)
-              {
-                // remove slimscroll elements
-                bar.remove();
-                rail.remove();
-                me.unwrap();
-                return;
-              }
+			  
 
               // scroll content by the given offset
               scrollContent(offset, false, true);
             }
-
+			
+			// check to see if the object was loaded with the destroy option
+			if(options==='destroy')
+			{
+			  destroyScroll(me,bar,rail);
+			}
+			
             return;
         }
 
@@ -200,7 +199,16 @@
         // append to parent div
         me.parent().append(bar);
         me.parent().append(rail);
-
+		
+		// check to see if the object was loaded with the destroy option
+		// this check is only for the first time slimscroll is used and 'destroy' is set
+		// which will most likely be a mistake, but handle it anyway
+		if(options==='destroy')
+		{
+		  destroyScroll(me,bar,rail);
+		  return;
+	    }
+		  
         // make it draggable
         if (o.railDraggable && $.ui && typeof($.ui.draggable) == 'function')
         {
@@ -426,6 +434,25 @@
               }
             }, 1000);
           }
+        }
+		
+		function destroyScroll(me,bar,rail)
+        {
+		  //clear any inline styles applied to the container
+		  me.css({
+		    overflow: '',
+		    width: '',
+		    height: ''
+		  });
+		  
+		  //remove touch handlers (touchstart & touchmove) - on touch devices this interferes with page scrolling
+		  me.unbind();
+		  
+		  // remove slimscroll elements
+		  bar.remove();
+		  rail.remove();
+		  me.unwrap();
+
         }
 
       });
